@@ -2,7 +2,7 @@ $mainColor: var(--main-color);
 $accentColor: var(--accent-color);
 $backgroundColor: var(--background-color);
 $backgroundColorTransparent: #eaeaea34;
-$widgetBlockSize: 8rem;
+$widgetBlockSize: 15rem;
 $modalShadow: 0rem 0rem 1rem 0.2rem rgba(0, 0, 0, 0.2);
 
 @function boxShadow($height) {

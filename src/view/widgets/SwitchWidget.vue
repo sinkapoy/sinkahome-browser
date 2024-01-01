@@ -19,6 +19,7 @@ onMounted(() => {
     store.destroyed = false;
     checkLedFunc();
     store.icon = props.widget.properties.get('icon')?.value;
+    name.effect.run();
 });
 onBeforeUnmount(() => {
     store.destroyed = true;
@@ -89,7 +90,7 @@ onBeforeUnmount(() => {
         margin-right: 0rem;
         width: 1rem;
         height: 1rem;
-        background-color: #9393AC;
+        background-color: var(--text-negative);
     }
 
     &__description {
@@ -135,7 +136,7 @@ onBeforeUnmount(() => {
             margin-right: 0rem;
             width: 1rem;
             height: 1rem;
-            background-color: #9393AC;
+            background-color: var(--text-negative);
             z-index: 0;
         }
     }
@@ -144,10 +145,11 @@ onBeforeUnmount(() => {
         flex: 3;
         height: inherit;
         display: flex;
+        word-break: break-all;
         align-items: center;
         align-content: center;
         justify-content: center;
-        color: $accentColor;
+        color: var(--text);
 
         h2 {
             margin: 0px;
@@ -157,6 +159,6 @@ onBeforeUnmount(() => {
 }
 
 .led-on {
-    background: #37C871;
+    background: var(--accent-color);
 }
 </style>

@@ -31,7 +31,7 @@ const height = computed(() => {
 
 <template>
     <template v-if="!store.isPortrait">
-        <div class="widget-landscape" :style="{
+        <div class="widget widget-landscape container" :style="{
             width: width * 4 + 'rem',
             height: height * 4 + 'rem',
         }
@@ -49,9 +49,19 @@ const height = computed(() => {
 <style scoped lang="scss">
 @import "../styles/variables";
 
+@keyframes show-widget {
+    from {
+        transform: scale(0%);
+    }
+    to {
+        transform: scale(100%);
+    }
+}
+.widget{
+    animation:0.4s cubic-bezier(.34,1.56,.4,.98) show-widget ;
+}
+
 .widget-landscape {
-    background-color: $mainColor;
-    color: white;
     text-align: center;
     width: $widgetBlockSize;
     height: $widgetBlockSize;

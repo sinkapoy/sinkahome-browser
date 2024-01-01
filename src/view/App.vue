@@ -3,18 +3,17 @@ import { RouterView, useRoute, useRouter } from 'vue-router';
 import panel from './Panel.vue';
 
 const route = useRoute();
-const router = useRouter();
 </script>
 
 <template>
     <div class="app">
         <panel />
-        <router-view :route="route" />
+        <router-view class="app__view" :route="route" />
     </div>
 </template>
 
 <style lang="scss">
-html body {
+html, body {
     width: 100vw;
     height: 100vh;
     padding: 0px;
@@ -27,7 +26,7 @@ html body {
     --accent-color: #0076b3;
     --background-color: #fafafa;
     --main-color-soft: #a9c0e4;
-    --text: black;
+    --text: var(--accent-color);
     --text-negative: white;
 }
 
@@ -35,14 +34,18 @@ button {
     background-color: white;
     border: none;
     padding: 0.4rem;
-    border-radius: 0.6rem;
     margin: 0.3rem;
     cursor: pointer;
+
+    &:disabled {
+    color: var(--main-color-soft)
+    }
+
+    &:hover {
+        transform: scale(110%);
+    }
 }
 
-button :disabled {
-    color: var(--main-color-soft)
-}
 
 h1,h2,h3,h4,h5 {
     margin: 0.1rem;
@@ -66,24 +69,43 @@ ul {
     }
 }
 
-#app {
-    width: 100%;
-    height: 100%;
-}
-
 .app {
-    font-family: Noto Sans, Avenir, Helvetica, Arial, sans-serif;
+    font-family: Roboto, Noto Sans, Avenir, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--background-color);
+    background: var(--background-color);
+    display: flex;
+    flex-direction: row;
+    column-gap: 1rem;
     overflow-y: scroll;
-    height: 100%;
-    width: 100%;
+    height: 100vh;
+    width: 100vw;
+
+    &__view{
+        padding: 1rem;
+    }
+}
+
+@keyframes show-container {
+    from {
+        transform: scale(0%);
+    }
+    to {
+        transform: scale(100%);
+    }
+}
+
+.container {
+    background: var(--main-color, #94B7EB);
+    color: var(--text-negative);
+    box-shadow: 0.5rem 0.5rem 1.5rem 0rem rgba(0, 0, 0, 0.25);
+    transition: 0.35s cubic-bezier(.34,1.56,.4,.98);
+    animation:0.35s cubic-bezier(.34,1.56,.4,.98) show-container ;
 }
 
 .widget-landscape {
     background-color: var(--main-color);
-    color: white;
+    color: var(--text-negative);
     text-align: center;
     width: 4rem;
     height: 4rem;
