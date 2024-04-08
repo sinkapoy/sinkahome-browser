@@ -3,6 +3,7 @@ import { IGadgetViewModel } from "./IGadgetViewModel";
 import { uuidT } from "@sinkapoy/home-core";
 
 export class RootViewModel {
+    portrait = false;
     gadgets: Record<uuidT, IGadgetViewModel> = {};
     widgets: Record<uuidT, IGadgetViewModel> = {};
 }

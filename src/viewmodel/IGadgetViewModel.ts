@@ -4,4 +4,5 @@ export interface IGadgetViewModel {
     properties: PropertiesComponent;
     actions: ActionsComponent;
     events: EventsComponent;
+    parentFolder?: uuidT;
 }

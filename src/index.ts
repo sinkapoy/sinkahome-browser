@@ -8,7 +8,15 @@ import WidgetsVue from "./view/WidgetsView.vue";
 import SettingsView from "./view/settings/SettingsView.vue"
 import { GadgetsViewModelSystem } from "./model/GadgetsViewModelSystem";
 import '@imengyu/vue3-context-menu/lib/vue3-context-menu.css'
+import { widgetsIndex } from "@sinkapoy/home-integrations-vue-widgets";
+import SwitchWidgetVue from "./view/widgets/SwitchWidget.vue";
+import FolderWidgetVue from "./view/widgets/FolderWidget.vue";
+import BindingWidgetVue from "./view/widgets/BindingWidget.vue";
+import { rootViewModel } from "./viewmodel/rootViewModel";
 
+widgetsIndex.typeAlias.switch = SwitchWidgetVue;
+widgetsIndex.typeAlias.folder = FolderWidgetVue;
+widgetsIndex.typeAlias.binding = BindingWidgetVue;
 
 const NETWORK_CONFIG = {
     port: 18956,
@@ -27,8 +35,10 @@ globalRoutes.addRoute('/settings', SettingsView, 'Settings');
 const app = createApp(App);
 const router = createRouter({ history: createWebHashHistory(), routes: globalRoutes.getRoutes() });
 app.use(router);
-router.push('/widgets');
 router.isReady().then(() => {
+    if (router.currentRoute.value.fullPath === '/') {
+        router.push('/widgets');
+    }
     app.mount('#app');
 });
 
@@ -46,5 +56,14 @@ console.log(process.env);
 setTimeout(() => {
     (homeEngine as unknown as HomeEngineT<ISocketClientEvents>).emit('networking:client-send', { comand: 'gadget-list' });
 }, 200)
+
+const resizeObserver = new ResizeObserver(() => {
+    if (matchMedia('(min-width: 30rem)').matches) {
+        rootViewModel.portrait = false;
+    } else {
+        rootViewModel.portrait = true;
+    }
+});
+resizeObserver.observe(document.body);
 
 

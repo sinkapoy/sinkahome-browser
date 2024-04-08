@@ -3,7 +3,7 @@ import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
 import { rootViewModel } from '@/viewmodel/rootViewModel';
 import SwitchWidget from './widgets/SwitchWidget.vue';
 import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
-import { onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 const vm = rootViewModel;
 const getType = function (widget: IGadgetViewModel) {
     console.log(widget.properties.get('type')?.value, widgetsIndex.typeAlias[widget.properties.get('type')?.value])
@@ -23,6 +23,11 @@ const show = () => {
         }
     }, 100);
 }
+
+const list = computed(() => {
+    return Object.values(vm.widgets).filter(widget => !widget.parentFolder);
+});
+
 widgetsIndex.typeAlias.switch = SwitchWidget;
 
 
@@ -38,41 +43,40 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="widgets-view">
-        <div v-for="widget, index in vm.widgets">
-            <component :is="widgetsIndex.typeAlias[getType(widget)]"
-                :widget="widget"></component>
-        </div>
+    <div class="widgets-view" :class="vm.portrait ? 'widgets-view-portrait' : '' ">
+        <template v-for="widget, index of list">
+            <component :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget" :portrait="vm.portrait"></component>
+        </template>
     </div>
 </template>
 
 <style scoped lang="scss">
 .widgets-view {
-    display: flex;
+    width: auto;
     margin-top: 0.6rem;
     row-gap: 1rem;
     column-gap: 1rem;
-}
-
-@media (orientation: landscape) {
-    .widgets-view {
-        flex-direction: row;
-        flex-wrap: wrap;
-        overflow-y: scroll;
+    
+    
+    overflow-y: scroll;
         padding: 0.5rem;
-
+        flex: 1;
         align-content: baseline;
         justify-content: left;
-    }
+
+
+        display: grid;
+        grid-template-rows: repeat(auto-fill, 4rem);
+        grid-template-columns: repeat(auto-fill, 4rem);
+        gap: 0.5rem;
 }
 
-@media (orientation: portrait) {
-    .widgets-view {
+.widgets-view-portrait {
         flex-direction: column;
         flex-wrap: nowrap;
         row-gap: 1rem;
         padding: 0.5rem;
         padding-bottom: 4rem;
+        display: flex;
     }
-}
 </style>

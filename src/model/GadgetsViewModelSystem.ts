@@ -22,23 +22,24 @@ export class GadgetsViewModelSystem extends HomeSystem {
 
     }
 
-    private onGadgetUpdate = (node:GadgetNode)=>{
+    private onGadgetUpdate = (node: GadgetNode) => {
         const vm = rootViewModel.gadgets[node.entity.name];
-        
-        if(vm?.properties){
-            for(const [id, prop] of node.properties.entries()){
+
+        if (vm?.properties) {
+            for (const [id, prop] of node.properties.entries()) {
                 const vmProp = vm.properties.get(id);
-                if(vmProp?.value !== prop.value){
-                    console.log('UPDATE VM')
+                if (vmProp) {
+                    if (vmProp.value !== prop.value) {
+                        Object.assign(vmProp, prop);
+                        prop.value = vmProp.value;
+                    }
+                    
                 }
-                if(vmProp){
-                    Object.assign(vmProp, prop);
-                }
-            }    
+            }
         } else {
             debugger;
         }
-        
+
     }
 
     private onGadgetAdd = (node: GadgetNode) => {
@@ -51,7 +52,7 @@ export class GadgetsViewModelSystem extends HomeSystem {
         rootViewModel.gadgets[node.data.uuid] = gadgetVm;
     }
 
-    private onPropertyWrite = (gadget: Entity, id: string, value: number | string | boolean)=>{
+    private onPropertyWrite = (gadget: Entity, id: string, value: number | string | boolean) => {
         console.log('write property', gadget.name, id, value)
     }
 }
@@ -63,5 +64,7 @@ engine.emit('networking:client-register-PAM', 'gadget-props', (msg: IServerDefau
         const gadget = rootViewModel.gadgets[msg.gadget];
         if (!gadget) throw new Error('cant find gadget ' + msg.gadget);
         rootViewModel.widgets[msg.gadget] = gadget;
+        gadget.parentFolder = msg.props.filter(prop => prop.id === 'parent')[0]?.value as string | undefined;
+
     }
 });

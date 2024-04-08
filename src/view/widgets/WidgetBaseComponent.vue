@@ -1,24 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeMount, onBeforeUnmount, reactive } from "vue";
+import { computed } from "vue";
 import { IGadgetViewModel } from "../../viewmodel/IGadgetViewModel";
 
-const props = defineProps<{ widget: IGadgetViewModel }>();
-
-const store = reactive({ isPortrait: false });
-
-const queryChecker = () => {
-    store.isPortrait = window.matchMedia('(orientation: portrait)').matches
-};
-
-
-onBeforeMount(() => {
-    window.addEventListener('resize', queryChecker);
-});
-onBeforeUnmount(() => {
-    window.removeEventListener('resize', queryChecker);
-})
-
-queryChecker();
+const props = defineProps<{ widget: IGadgetViewModel , portrait: boolean}>();
 
 const width = computed(() => {
     return props.widget.properties.get('width')?.value || 2;
@@ -26,14 +10,22 @@ const width = computed(() => {
 const height = computed(() => {
     return props.widget.properties.get('height')?.value || 2;
 });
+const x = computed(() => {
+    return props.widget.properties.get('x')?.value || 0;
+});
+const y = computed(() => {
+    return props.widget.properties.get('y')?.value || 0;
+});
 
 </script>
 
 <template>
-    <template v-if="!store.isPortrait">
+    <template v-if="!props.portrait">
         <div class="widget widget-landscape container" :style="{
-            width: width * 4 + 'rem',
-            height: height * 4 + 'rem',
+            width: width * 4 + (width - 1) * 0.5 + 'rem',
+            height: height * 4 + (height - 1) * 0.5 + 'rem',
+            'grid-row': (y + 1) + '',
+            'grid-column': (x + 1) + '',
         }
             ">
             <slot name="landscape" />
@@ -53,12 +45,14 @@ const height = computed(() => {
     from {
         transform: scale(0%);
     }
+
     to {
         transform: scale(100%);
     }
 }
-.widget{
-    animation:0.4s cubic-bezier(.34,1.56,.4,.98) show-widget ;
+
+.widget {
+    animation: 0.4s cubic-bezier(.34, 1.56, .4, .98) show-widget;
 }
 
 .widget-landscape {

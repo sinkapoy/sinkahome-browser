@@ -4,7 +4,7 @@ import WidgetBaseComponent from './WidgetBaseComponent.vue';
 import { WritePropertyCommand } from "@sinkapoy/home-integrations-commands";
 import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
 
-const props = defineProps<{ widget: IWidgetViewModel }>();
+const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean }>();
 const store = reactive({ destroyed: false, ledState: false, icon: null });
 const name = computed(() => props.widget.properties.get('name')?.value || 'untitled');
 const switchCmd = new WritePropertyCommand(props.widget.uuid, 'key', 1);
@@ -28,7 +28,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <WidgetBaseComponent :widget="props.widget">
+    <WidgetBaseComponent :widget="props.widget" :portrait="props.portrait">
         <template #landscape>
             <div @click="switchCmd.execute()" class="switch-landscape">
                 <div v-bind:class="{ 'switch-landscape_led': true, 'led-on': store.ledState }" />
@@ -64,16 +64,21 @@ onBeforeUnmount(() => {
     padding: 0px;
 
     .img {
-        width: auto;
         height: 100%;
         width: 100%;
+        display: flex;
+        flex-direction: column;
         margin: 0px;
         margin-top: -1rem;
-        padding-top: 10%;
+        align-content: center;
+        align-items: center;
+        justify-content: center;
 
         img {
-            height: 80%;
+            max-width: 80%;
+            max-height: 80%;
             width: auto;
+            height: auto;
             margin: 0px;
         }
     }
@@ -95,7 +100,6 @@ onBeforeUnmount(() => {
 
     &__description {
         position: relative;
-        margin-top: -0.7rem;
         transform: translate(0px, -100%);
         background-color: #ffffffbf;
         color: #214478ff;

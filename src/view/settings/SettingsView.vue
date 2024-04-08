@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import SettingsGadgetsListComponent from './SettingsGadgetsListComponent.vue';
+import SettingsGadgetsListComponent from './gadgetList/SettingsGadgetsListComponent.vue';
 
 const data = reactive({
     currentTab: 0,
@@ -26,7 +26,7 @@ const selectTab = (tab: number)=>{
 <style scoped lang="scss">
 .settings-view{
     display: flex;
-    
+    width: auto;
     flex-direction: column;
     row-gap: 1rem;
     

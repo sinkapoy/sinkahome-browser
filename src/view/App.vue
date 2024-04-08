@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { RouterView, useRoute, useRouter } from 'vue-router';
 import panel from './Panel.vue';
-
+import { rootViewModel } from '@/viewmodel/rootViewModel';
+const vm = rootViewModel;
 const route = useRoute();
 </script>
 
 <template>
     <div class="app">
         <panel />
-        <router-view class="app__view" :route="route" />
+        <router-view class="app__view" :route="route" :widgets="vm.widgets"/>
     </div>
 </template>
 
@@ -76,6 +77,7 @@ ul {
     background: var(--background-color);
     display: flex;
     flex-direction: row;
+    flex-wrap: nowrap;
     column-gap: 1rem;
     overflow-y: scroll;
     height: 100vh;
