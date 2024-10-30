@@ -3,11 +3,10 @@ import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
 import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
 import { onMounted, reactive, ref, watch, defineProps } from 'vue';
 
-const props = defineProps<{ widgets: IGadgetViewModel[], portrait: boolean }>();
+const props = defineProps<{ widgets: IGadgetViewModel[], portrait: boolean; }>();
 const getType = function (widget: IGadgetViewModel) {
-    console.log(widget.properties.get('type')?.value, widgetsIndex.typeAlias[widget.properties.get('type')?.value])
-    return widget.properties.get('type')?.value;
-}
+    return widget.properties['type']?.value;
+};
 const data = reactive({
     currentCount: 0,
     interval: -1 as unknown as NodeJS.Timeout,
@@ -21,7 +20,7 @@ const show = () => {
             data.interval = -1 as any;
         }
     }, 100);
-}
+};
 
 
 
@@ -32,14 +31,17 @@ watch(props.widgets, () => {
 
 onMounted(() => {
     data.currentCount = 0;
-    // show();
+    show();
 });
 </script>
 
 <template>
     <div class="folder-layout" :class="props.portrait ? 'folder-layout-portrait' : ''">
-        <component v-for="widget, index in props.widgets" :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget"
+        <template v-for="widget, index in props.widgets">
+            <component v-if="index <= data.currentCount" :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget"
             :portrait="props.portrait"></component>
+        </template>
+        
     </div>
 </template>
 
@@ -67,6 +69,5 @@ onMounted(() => {
     flex-wrap: nowrap;
     row-gap: 1rem;
     padding: 0.5rem;
-    padding-bottom: 4rem;
 }
 </style>

@@ -5,35 +5,38 @@ import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
 import { rootViewModel } from '@/viewmodel/rootViewModel';
 import { WritePropertyCommand } from '@sinkapoy/home-integrations-commands';
 import { PropertyAccessMode } from '@sinkapoy/home-core';
+import { bindingLayouts, getBindingTypeByProperty } from './bindings/bindingLayouts';
 
 //todo: refactoring
 const vm = rootViewModel;
-const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean }>();
-const binding = {
-    uuid: props.widget.properties.get('targetUuid')?.value,
-    propId: props.widget.properties.get('targetProperty')?.value,
-    placeholder: props.widget.properties.get('placeholder')?.value,
-}
-
+const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean; }>();
+const binding = props.widget.properties['bindInfo']?.value ?? {};
+const width = computed(() => {
+    return props.widget.properties['width']?.value || 2;
+});
 const store = reactive({
     destroyed: false,
     realValue: '',
     inputValue: '',
     writable: false,
+    units: '',
+    widgetWidth: width,
+    type: 'readable'
 });
 
-const name = computed(() => props.widget.properties.get('name')?.value || 'untitled');
-const width = computed(() => {
-    return props.widget.properties.get('width')?.value || 2;
-});
+const name = computed(() => props.widget.properties['name']?.value || 'untitled');
+
 const checker = () => {
-    const prop = vm.gadgets[binding.uuid]?.properties.get(binding.propId);
+    const prop = vm.gadgets[binding.uuid]?.properties[binding.property];
     store.writable = !!((prop?.accessMode || 0) & PropertyAccessMode.write);
-    store.realValue = prop?.value ?? binding.placeholder;
-}
-const writeClickCallback = () => {
-    new WritePropertyCommand(binding.uuid, binding.propId, store.inputValue).execute();
-}
+    store.realValue = prop?.value as any ?? binding.placeholder;
+    store.units = prop?.units ?? '';
+    if (prop)
+        store.type = getBindingTypeByProperty(prop, binding);
+};
+const writeClickCallback = (value: any) => {
+    new WritePropertyCommand(binding.uuid, binding.property, value).execute();
+};
 
 const interval = setInterval(checker, 400);
 
@@ -55,27 +58,15 @@ onBeforeUnmount(() => {
     <WidgetBaseComponent :widget="props.widget" :portrait="props.portrait">
         <template #landscape>
             <div class="binding binding-landscape">
-                <label>{{ name }}</label>
-                <label>{{ store.realValue }}</label>
-                <div v-if="store.writable">
-                    <input v-model="store.inputValue" :size="width * 4" />
-                    <button @click="writeClickCallback">ok</button>
-                </div>
-
+                <component :is="bindingLayouts[store.type]" :store="store" :name="name" :binding="binding" :isAlbum ="true" @write="writeClickCallback"/>
             </div>
 
         </template>
 
         <template #portrait>
             <div class="binding binding-portrait">
-                <div class="binding binding-landscape">
-                    <label>{{ name }}</label>
-                    <label>{{ store.realValue }}</label>
-                    <div v-if="store.writable">
-                        <input v-model="store.inputValue" :size="width * 4" />
-                        <button @click="writeClickCallback">ok</button>
-                    </div>
-
+                <div class="binding ">
+                    <component :is="bindingLayouts[store.type]" :store="store" :name="name" :binding="binding" @write="writeClickCallback" :isAlbum="false"/>
                 </div>
             </div>
         </template>
@@ -101,6 +92,8 @@ onBeforeUnmount(() => {
     width: inherit;
     height: inherit;
     padding: 0px;
+    --slider-connect-bg: var(--background-color);
+    --slider-bg: var(--accent-color)
 }
 
 .binding-portrait {
@@ -109,6 +102,8 @@ onBeforeUnmount(() => {
     max-height: 6rem;
     border-top: solid 0.1rem var(--main-color);
     border-bottom: solid 0.1rem var(--main-color);
+    --slider-connect-bg: var(--main-color);
+    --slider-bg: var(--accent-color)
 }
 
 .led-on {

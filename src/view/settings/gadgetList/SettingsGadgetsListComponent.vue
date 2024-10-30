@@ -3,6 +3,7 @@ import { rootViewModel } from '@/viewmodel/rootViewModel';
 import { PropertiesComponent, Property } from '@sinkapoy/home-core';
 import { reactive } from 'vue';
 import GadgetPropertyComponent from './GadgetPropertyComponent.vue';
+import GadgetActionComponent from './GadgetActionComponent.vue';
 
 // todo: use router
 const store = reactive({
@@ -11,16 +12,15 @@ const store = reactive({
 });
 const vm = rootViewModel;
 
-const clickSelectGadget = async (uuid: string)=>{
+const clickSelectGadget = async (uuid: string) => {
     store.showProps = uuid;
-    store.gadgetProps = [];
-    for(const prop of rootViewModel.gadgets[uuid].properties.values()){
+    for (const prop of Object.values(rootViewModel.gadgets[uuid].properties)) {
         store.gadgetProps.push(prop);
         await Promise.resolve();
     }
-}
+};
 
-const clickBack = ()=>{
+const clickBack = () => {
     store.showProps = null;
 }
 
@@ -30,18 +30,32 @@ const clickBack = ()=>{
     <div class="container window">
         <template v-if="!store.showProps">
             <div class="container gadget" v-for="gadget in vm.gadgets" @click="clickSelectGadget(gadget.uuid)">
-            <div>
-                <h3>{{ gadget.uuid }}</h3>
+                <div>
+                    <h3>{{ gadget.uuid }}</h3>
+
+                    <h4 v-if="gadget.properties['user-name']?.value">
+                        {{ gadget.properties['user-name'].value }}
+                    </h4>
+                </div>
             </div>
-        </div>
         </template>
         <div v-else class="container gadget-settings">
             <button @click="clickBack">back</button>
-            <div> <h3>{{ store.showProps }}</h3> </div>
+            <div>
+                <h3>{{ store.showProps }}</h3>
+            </div>
             <div class="properties">
                 <h4>Properties</h4>
                 <div class="properties__content">
-                    <GadgetPropertyComponent v-for="property of store.gadgetProps" :prop="property" :uuid="store.showProps"/>
+                    <GadgetPropertyComponent v-for="property of rootViewModel.gadgets[store.showProps].properties" :prop="property"
+                        :uuid="store.showProps" />
+                </div>
+            </div>
+            <div class="actions">
+                <h4>Actions</h4>
+                <div class="actions__content">
+                    <GadgetActionComponent v-for="action of rootViewModel.gadgets[store.showProps].actions" :action="action"
+                        :uuid="store.showProps" />
                 </div>
             </div>
         </div>
@@ -62,23 +76,31 @@ const clickBack = ()=>{
 }
 
 .gadget {
-    overflow: hidden;
-    text-wrap:wrap;
-    word-wrap:break-word;
+    overflow: clip;
+    text-wrap: wrap;
+    word-wrap: break-word;
     padding: 0.5rem;
     user-select: none;
+
+    text-align: left;
 }
 
 .gadget-settings {
     overflow: auto;
 
-    &__properies{
+    &__properies {
         display: flex;
 
     }
 }
 
 .properties {
+    &__content {
+        display: table;
+    }
+}
+
+.actions {
     &__content {
         display: table;
     }

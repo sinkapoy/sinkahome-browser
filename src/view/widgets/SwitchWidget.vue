@@ -2,23 +2,23 @@
 import { computed, onBeforeUnmount, onMounted, reactive } from 'vue';
 import WidgetBaseComponent from './WidgetBaseComponent.vue';
 import { WritePropertyCommand } from "@sinkapoy/home-integrations-commands";
-import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
+import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
 
-const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean }>();
+const props = defineProps<{ widget: IGadgetViewModel, portrait: boolean; }>();
 const store = reactive({ destroyed: false, ledState: false, icon: null });
-const name = computed(() => props.widget.properties.get('name')?.value || 'untitled');
+const name = computed(() => props.widget.properties['name']?.value || 'untitled');
 const switchCmd = new WritePropertyCommand(props.widget.uuid, 'key', 1);
 
 const checkLedFunc = () => {
     if (!store.destroyed) {
-        store.ledState = props.widget.properties.get('led')?.value;
+        store.ledState = props.widget.properties['led']?.value;
         requestAnimationFrame(checkLedFunc);
     }
-}
+};
 onMounted(() => {
     store.destroyed = false;
     checkLedFunc();
-    store.icon = props.widget.properties.get('icon')?.value;
+    store.icon = props.widget.properties['icon']?.value;
     name.effect.run();
 });
 onBeforeUnmount(() => {

@@ -6,8 +6,7 @@ import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 const vm = rootViewModel;
 const getType = function (widget: IGadgetViewModel) {
-    console.log(widget.properties.get('type')?.value, widgetsIndex.typeAlias[widget.properties.get('type')?.value])
-    return widget.properties.get('type')?.value;
+    return (widget.properties['type']?.value ?? '') as string;
 }
 const data = reactive({
     currentCount: 0,
@@ -21,7 +20,7 @@ const show = () => {
             clearInterval(data.interval);
             data.interval = -1 as any;
         }
-    }, 100);
+    }, 50);
 }
 
 const list = computed(() => {
@@ -44,8 +43,8 @@ onMounted(() => {
 
 <template>
     <div class="widgets-view" :class="vm.portrait ? 'widgets-view-portrait' : '' ">
-        <template v-for="widget, index of list">
-            <component :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget" :portrait="vm.portrait"></component>
+        <template v-for="widget, index of list" >
+            <component v-if="Number(index) <= data.currentCount" :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget" :portrait="vm.portrait"></component>
         </template>
     </div>
 </template>

@@ -1,7 +1,8 @@
 <script setup lang="ts">
+import Multiselect from '@vueform/multiselect';
 import { Property, PropertyAccessMode, PropertyDataType, homeEngine } from '@sinkapoy/home-core';
-import { computed, onBeforeUnmount, onMounted, reactive, defineProps } from 'vue';
-const { prop, uuid } = defineProps<{ prop: Property<any>, uuid: string }>();
+import { computed, onBeforeUnmount, onMounted, reactive, defineProps, watch, render, getCurrentInstance, ref } from 'vue';
+const { prop, uuid } = defineProps<{ prop: Property<any>, uuid: string; }>();
 
 const writeValue = (prop: Property<any>) => {
     const entity = homeEngine.getEntityByName(uuid);
@@ -10,14 +11,33 @@ const writeValue = (prop: Property<any>) => {
         case PropertyDataType.float:
             prop.value = Number(prop.value);
         case PropertyDataType.int:
-            prop.value = Math.round(prop.value);
+            prop.value = Math.round(Number(prop.value));
             break;
-        case PropertyDataType.boolean:
-            prop.value = prop.value == 'true';
-            break;
+        // case PropertyDataType.boolean:
+        //     prop.value = prop.value == 'true';
+        //     break;
     }
     homeEngine.emit('writeGadgetProperty', entity, prop.id, prop.value);
-}
+};
+
+const value = computed(() => prop.value);
+const reference = ref(prop);
+let timer: number;
+
+onMounted(() => {
+    timer = setInterval(()=>{
+        if(prop.value !== value.value){
+            value.effect.run();
+            for(const entry of (reference as unknown as {dep: Set<any>}).dep.values()){
+                entry.fn()
+            }
+        }
+    }, 235) as unknown as number;
+});
+
+onBeforeUnmount(() => {
+    clearInterval(timer);
+});
 
 </script>
 
@@ -25,16 +45,18 @@ const writeValue = (prop: Property<any>) => {
     <div class="property">
         <div>{{ prop.id }}</div>
         <div>{{ PropertyAccessMode[prop.accessMode] }}</div>
+        <div>{{ PropertyDataType[prop.dataType] }}</div>
         <div v-if="prop.enumData && (prop.accessMode & PropertyAccessMode.write)">
-            
+            <Multiselect :mode="'single'" @select="writeValue(prop)" v-model="reference.value"
+                :options="Object.values(prop.enumData)" :can-clear="false" />
         </div>
         <div v-else-if="prop.accessMode & PropertyAccessMode.write">
-            <input v-model="prop.value">
+            <input v-model="reference.value">
             <span v-if="prop.units">{{ prop.units }}</span>
-            <button @click="writeValue(prop)">write</button>
+            <button @click="writeValue(prop)">-></button>
         </div>
         <div v-else-if="prop.accessMode & PropertyAccessMode.read">
-            {{ prop.value }}
+            {{ reference.value }}
         </div>
     </div>
 </template>

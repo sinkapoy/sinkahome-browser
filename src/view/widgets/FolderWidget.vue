@@ -9,8 +9,8 @@ import { rootViewModel } from '@/viewmodel/rootViewModel';
 const vm = rootViewModel;
 const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean }>();
 const store = reactive({ destroyed: false });
-const name = computed(() => props.widget.properties.get('name')?.value || 'untitled');
-const childrenProp = props.widget.properties.get('children');
+const name = computed(() => props.widget.properties['name']?.value || 'untitled');
+const childrenProp = props.widget.properties['children'];
 const layout = childrenProp?.value ?? [];
 const children = computed(()=>{
     return layout.map(uuid=>vm.widgets[uuid]).filter(w=>w !== undefined);

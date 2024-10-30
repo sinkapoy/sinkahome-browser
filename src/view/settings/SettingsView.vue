@@ -15,7 +15,7 @@ const selectTab = (tab: number)=>{
 </script>
 
 <template>
-    <div class="settings-view">
+    <div :class="'settings-view'">
         <div class="header">
             <button v-for="tab, index in tabs" class="container" @click="selectTab(index)">{{ tab.name }}</button>
         </div>
@@ -29,7 +29,8 @@ const selectTab = (tab: number)=>{
     width: auto;
     flex-direction: column;
     row-gap: 1rem;
-    
+    flex: 1;
+    flex-wrap: nowrap;
 }
 
 .header {
@@ -41,6 +42,7 @@ const selectTab = (tab: number)=>{
 
 .content {
     width: 100%;
-    flex-wrap: wrap;
+    align-items: stretch;
+    overflow-y: auto;   
 }
 </style>
