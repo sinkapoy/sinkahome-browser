@@ -1,6 +1,7 @@
+import { globalRoutes, widgetsIndex as widgetsIndex2 } from "@sinkapoy/home-integrations-vue-components";
 import { createRouter, createWebHashHistory } from "vue-router";
 import { ISocketClientEvents, configureNetworking } from "@sinkapoy/home-integrations-networking";
-import { globalRoutes } from "@sinkapoy/home-integrations-vue-router";
+
 import { HomeEngineT, homeEngine } from "@sinkapoy/home-core";
 import { createApp } from "vue";
 import App from "./view/App.vue";
@@ -19,10 +20,13 @@ import BindingWidgetVue from "./view/widgets/BindingWidget.vue";
 import { rootViewModel } from "./viewmodel/rootViewModel";
 import { soundManager } from "./model/SoundManager";
 
+import "@sinkapoy/home-integrations-miot";
+import { WidgetBaseComponent } from '@sinkapoy/home-integrations-vue-components';
+
 widgetsIndex.typeAlias.switch = SwitchWidgetVue;
 widgetsIndex.typeAlias.folder = FolderWidgetVue;
 widgetsIndex.typeAlias.binding = BindingWidgetVue;
-
+Object.assign(widgetsIndex.typeAlias, widgetsIndex2.typeAlias);
 const NETWORK_CONFIG = {
     port: 18956,
     clientsConfig: [

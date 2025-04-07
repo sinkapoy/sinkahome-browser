@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-widgets';
 
-const props = defineProps<{ widget: IWidgetViewModel , portrait: boolean}>();
+const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean; }>();
 
 const width = computed(() => {
     return props.widget.properties['width']?.value as number || 2;
@@ -22,16 +22,17 @@ const y = computed(() => {
 </script>
 
 <template>
-    <audio autoplay>
-        <source src="pop.mp3" />
-    </audio>
+    
     <template v-if="!props.portrait">
         <div class="widget widget-landscape container" :style="{
             width: width * 4 + (width - 1) * 0.5 + 'rem',
             height: height * 4 + (height - 1) * 0.5 + 'rem',
-            'grid-area': `${(y + 1)}/${(x + 1)}/${y+1+height}/${x+1+width}`,
+            'grid-area': `${(y + 1)}/${(x + 1)}/${y + 1 + height}/${x + 1 + width}`,
         }
             ">
+            <audio autoplay>
+            <source src="pop.mp3" />
+            </audio>
             <slot name="landscape" />
         </div>
     </template>

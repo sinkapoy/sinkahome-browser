@@ -14,6 +14,9 @@ const binding = props.widget.properties['bindInfo']?.value ?? {};
 const width = computed(() => {
     return props.widget.properties['width']?.value || 2;
 });
+const height = computed(() => {
+    return props.widget.properties['height']?.value || 2;
+});
 const store = reactive({
     destroyed: false,
     realValue: '',
@@ -21,6 +24,7 @@ const store = reactive({
     writable: false,
     units: '',
     widgetWidth: width,
+    widgetHeight: height,
     type: 'readable'
 });
 

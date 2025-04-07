@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
 import { rootViewModel } from '@/viewmodel/rootViewModel';
 import SwitchWidget from './widgets/SwitchWidget.vue';
 import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
 const vm = rootViewModel;
-const getType = function (widget: IGadgetViewModel) {
+const getType = function (widget: IWidgetViewModel) {
     return (widget.properties['type']?.value ?? '') as string;
 }
 const data = reactive({
@@ -29,7 +29,15 @@ const list = computed(() => {
 
 widgetsIndex.typeAlias.switch = SwitchWidget;
 
+const getWidgetStyle = (widget: IWidgetViewModel)=>{
+    const x = widget.properties['x'].value || 0;
+    const y = widget.properties['y'].value || 0;
 
+    return {
+        'margin-left': x*4 + 'rem',
+        'margin-top': y*4 + 'rem',
+    }
+}
 
 watch(vm.widgets, () => {
     show();
@@ -44,7 +52,7 @@ onMounted(() => {
 <template>
     <div class="widgets-view" :class="vm.portrait ? 'widgets-view-portrait' : '' ">
         <template v-for="widget, index of list" >
-            <component v-if="Number(index) <= data.currentCount" :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget" :portrait="vm.portrait"></component>
+            <component v-if="Number(index) <= data.currentCount" :is="widgetsIndex.typeAlias[getType(widget)]"  :widget="widget" :portrait="vm.portrait"></component>
         </template>
     </div>
 </template>

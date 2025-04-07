@@ -26,6 +26,24 @@ const unwatch = watch(props.store, (s) => {
     <label>{{ props.store.realValue + props.store.units }}</label>
     <div v-if="store.writable">
         <input v-model="model.value" :size="props.store.widgetWidth * 4" />
-        <button @click="$emit('write', model.value)">ok</button>
+        <button class="ok-button" @click="$emit('write', model.value)">→</button>
     </div>
 </template>
+
+<style scoped lang='scss' >
+    input {
+        background-color: var(--background-color);
+        border: none;
+    }
+
+    .ok-button {
+        width: 1.5rem;
+        height: 1.5rem;
+        padding: 0px;
+        font-weight: 900;
+        background-color: var(--main-color);
+        color: var(--background-color);
+        border: 0.1rem solid var(--background-color);
+        border-radius: 50%;
+    }
+</style>

@@ -6,7 +6,7 @@ const webpack = require('webpack');
 const { DefinePlugin } = require("webpack");
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const { VueLoaderPlugin } = require("vue-loader");
-
+const CopyPlugin = require("copy-webpack-plugin");
 const mode = "development";
 
 module.exports = {
@@ -27,8 +27,8 @@ module.exports = {
             new TsConfigPathsPlugin({})
         ],
         alias: {
-            "vue": "vue/dist/vue.esm-bundler.js",
-        }
+            vue: path.resolve("./node_modules/vue"),
+        },
     },
     module: {
         rules: [
@@ -77,7 +77,7 @@ module.exports = {
         //     },
         // },
     },
-
+    
     plugins: [
         new webpack.ProgressPlugin(),
         new VueLoaderPlugin(),
@@ -94,5 +94,12 @@ module.exports = {
                 environment: '"development"'
             }
         }),
+        new CopyPlugin({
+            patterns: [
+              { from: path.resolve(__dirname, "./node_modules/@sinkapoy/home-integrations-vue-components/dist/assets/images/"), to: path.resolve(__dirname,"assets/images/"), noErrorOnMissing: true, },
+              
+            ],
+            
+          }),
     ]
 };

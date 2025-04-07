@@ -27,7 +27,7 @@ onBeforeUnmount(unwatch);
 
 <template>
     <label>{{ name }}</label>
-    <label>{{ props.store.realValue + store.units }}</label>
+    <label v-if="props.store.widgetHeight >= 2">{{ props.store.realValue + store.units }}</label>
     <Slider class="slider" v-model="model.value" :style="{ width: props.isAlbum ? props.store.widgetWidth * 2 + 'rem' : ''}"
         :step="binding.step" :min="binding.min" :max="binding.max" @change="onChange" />
 </template>
@@ -35,6 +35,6 @@ onBeforeUnmount(unwatch);
 <style scoped lang="scss">
 .slider-target {
     width: 80%;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
 }
 </style>

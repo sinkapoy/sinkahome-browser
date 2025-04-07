@@ -6,4 +6,5 @@ export interface IBindingLayout {
     writable: boolean;
     units: string;
     widgetWidth: number;
+    widgetHeight: number;
 }

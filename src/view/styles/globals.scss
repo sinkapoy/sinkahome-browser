@@ -98,6 +98,7 @@ ul {
     height: 4rem;
     display: block;
     box-shadow: boxShadow(0.1rem);
+    position: relative;
 }
 
 .widget-portrait {
@@ -123,4 +124,30 @@ ul {
 
 .toggle {
     margin: 0.5rem;
+}
+
+.widget {
+    user-select: none;
+
+    .toggle {
+        margin: 0;
+        height: 1rem;
+        width: 2.4rem;
+        background-color: var(--main-color);
+        border: 0.1rem solid var(--background-color);
+    }
+
+    .toggle-on {
+        background-color: var(--accent-color);
+    }
+
+    .toggle-handle {
+        height: 1rem;
+        width: 1rem;
+        background-color: var(--background-color);
+    }
+
+    .slider-tooltip {
+        bottom: 1rem;
+    }
 }

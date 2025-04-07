@@ -52,27 +52,25 @@ export class GadgetsViewModelSystem extends HomeSystem {
         if (vm?.properties) {
             for (const [id, prop] of node.properties.entries()) {
                 const vmProp = vm.properties[id];
-                if (vmProp) {
-                    if (vmProp.value !== prop.value) {
-                        vmProp.value = prop.value;
-                        prop.value = vmProp.value;
-
-                    }
-
+                if(vmProp){
+                    //
                 } else {
-                    vm.properties[id] = reactive(prop);
-                    // console.log(id)
+                    // inject reactivity to model
+                    const p = reactive(prop);
+                    vm.properties[id] = p;
+                    node.properties.set(id, p);
                 }
             }
         }
 
         if(vm.actions){
             for (const [id, action] of node.actions.entries()) {
-                const vmProp = vm.properties[id];
-                if (vmProp) {
+                const vmAction = vm.properties[id];
+                if (vmAction) {
                     // todo: set here invoke state and args with result
                 } else {
-                    vm.actions[id] = action;
+                    vm.actions[id] = reactive(action);
+                    node.actions.set(id, vm.actions[id]);
                 }
             }
         }

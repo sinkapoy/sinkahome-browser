@@ -21,8 +21,17 @@ const writeValue = (prop: Property<any>) => {
 };
 
 const value = computed(() => prop.value);
-const reference = ref(prop);
+const reference = prop;
 let timer: number;
+const propEnumOptions = computed(()=>{
+    if(prop.enumData)
+        return Object.keys(prop.enumData).map((key)=>{
+            return {
+                label: key,
+                value: prop.enumData![key],
+            }
+        })
+});
 
 onMounted(() => {
     timer = setInterval(()=>{
@@ -48,7 +57,8 @@ onBeforeUnmount(() => {
         <div>{{ PropertyDataType[prop.dataType] }}</div>
         <div v-if="prop.enumData && (prop.accessMode & PropertyAccessMode.write)">
             <Multiselect :mode="'single'" @select="writeValue(prop)" v-model="reference.value"
-                :options="Object.values(prop.enumData)" :can-clear="false" />
+                :options="propEnumOptions" :can-clear="false" >
+            </Multiselect>
         </div>
         <div v-else-if="prop.accessMode & PropertyAccessMode.write">
             <input v-model="reference.value">
