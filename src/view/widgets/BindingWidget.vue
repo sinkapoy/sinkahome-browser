@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive } from 'vue';
-import WidgetBaseComponent from './WidgetBaseComponent.vue';
-import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
+import {WidgetBaseComponent} from '@sinkapoy/home-integrations-vue-components';
+import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
 import { rootViewModel } from '@/viewmodel/rootViewModel';
 import { WritePropertyCommand } from '@sinkapoy/home-integrations-commands';
 import { PropertyAccessMode } from '@sinkapoy/home-core';
@@ -9,7 +9,7 @@ import { bindingLayouts, getBindingTypeByProperty } from './bindings/bindingLayo
 
 //todo: refactoring
 const vm = rootViewModel;
-const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean; }>();
+const props = defineProps<{ widget: IWidgetViewModel; portrait: boolean; }>();
 const binding = props.widget.properties['bindInfo']?.value ?? {};
 const width = computed(() => {
     return props.widget.properties['width']?.value || 2;
@@ -46,7 +46,7 @@ const interval = setInterval(checker, 400);
 
 onMounted(() => {
     store.destroyed = false;
-    name.effect.run();
+    // name.effect.run();
     checker();
     store.inputValue = store.realValue;
 
@@ -59,19 +59,37 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <WidgetBaseComponent :widget="props.widget" :portrait="props.portrait">
+    <WidgetBaseComponent
+        :header-as-name="true"
+        :widget="props.widget"
+        :portrait="props.portrait"
+    >
         <template #landscape>
             <div class="binding binding-landscape">
-                <component :is="bindingLayouts[store.type]" :store="store" :name="name" :binding="binding" :isAlbum ="true" @write="writeClickCallback"/>
+                <div class="v-label">
+                    {{ name }}
+                </div>
+                <component
+                    :is="bindingLayouts[store.type]"
+                    :store="store"
+                    :name="name"
+                    :binding="binding"
+                    :is-album="true"
+                    @write="writeClickCallback"
+                />
             </div>
-
         </template>
 
         <template #portrait>
             <div class="binding binding-portrait">
-                <div class="binding ">
-                    <component :is="bindingLayouts[store.type]" :store="store" :name="name" :binding="binding" @write="writeClickCallback" :isAlbum="false"/>
-                </div>
+                <component
+                    :is="bindingLayouts[store.type]"
+                    :store="store"
+                    :name="name"
+                    :binding="binding"
+                    :is-album="false"
+                    @write="writeClickCallback"
+                />
             </div>
         </template>
     </WidgetBaseComponent>
@@ -96,16 +114,19 @@ onBeforeUnmount(() => {
     width: inherit;
     height: inherit;
     padding: 0px;
-    --slider-connect-bg: var(--background-color);
-    --slider-bg: var(--accent-color)
+    
+    .v-label {
+        width:80%;
+        margin: 0.1rem;
+        word-break: break-all;
+        text-align: center;
+    }
 }
 
 .binding-portrait {
     display: flex;
     flex-direction: row;
-    max-height: 6rem;
-    border-top: solid 0.1rem var(--main-color);
-    border-bottom: solid 0.1rem var(--main-color);
+    max-height: 4rem;
     --slider-connect-bg: var(--main-color);
     --slider-bg: var(--accent-color)
 }

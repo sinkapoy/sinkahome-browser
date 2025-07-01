@@ -1,4 +1,4 @@
-import { uuidT, IProperty, IAction, IGadgetEvent, Property, ActionT } from "@sinkapoy/home-core";
+import { uuidT, IGadgetEvent, Property, ActionT } from '@sinkapoy/home-core';
 
 /** @deprecated */
 export interface IGadgetViewModel {

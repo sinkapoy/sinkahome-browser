@@ -1,17 +1,24 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive } from 'vue';
-import WidgetBaseComponent from './WidgetBaseComponent.vue';
-import { WritePropertyCommand } from "@sinkapoy/home-integrations-commands";
-import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
+import {WidgetBaseComponent} from '@sinkapoy/home-integrations-vue-components';
+import { ReadPropertyCommand, WritePropertyCommand } from '@sinkapoy/home-integrations-commands';
+import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
 
-const props = defineProps<{ widget: IGadgetViewModel, portrait: boolean; }>();
+const props = defineProps<{ widget: IWidgetViewModel; portrait: boolean; }>();
 const store = reactive({ destroyed: false, ledState: false, icon: null });
 const name = computed(() => props.widget.properties['name']?.value || 'untitled');
-const switchCmd = new WritePropertyCommand(props.widget.uuid, 'key', 1);
+const switchCmd = async()=>{
+    // compatibility with the older version
+    new WritePropertyCommand(props.widget.uuid, 'key', 1).execute();
+    // the new version
+    const prop = new ReadPropertyCommand(props.widget.uuid, 'on');
+    await prop.execute();
+    new WritePropertyCommand(props.widget.uuid, 'on', !prop.property?.value).execute();
+};
 
 const checkLedFunc = () => {
     if (!store.destroyed) {
-        store.ledState = props.widget.properties['led']?.value;
+        store.ledState = props.widget.properties['on']?.value || props.widget.properties['key']?.value;
         requestAnimationFrame(checkLedFunc);
     }
 };
@@ -19,7 +26,7 @@ onMounted(() => {
     store.destroyed = false;
     checkLedFunc();
     store.icon = props.widget.properties['icon']?.value;
-    name.effect.run();
+    // name.effect.run();
 });
 onBeforeUnmount(() => {
     store.destroyed = true;
@@ -28,24 +35,41 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <WidgetBaseComponent :widget="props.widget" :portrait="props.portrait">
+    <WidgetBaseComponent
+        :widget="props.widget"
+        :portrait="props.portrait"
+    >
         <template #landscape>
-            <div @click="switchCmd.execute()" class="switch-landscape">
-                <div v-bind:class="{ 'switch-landscape_led': true, 'led-on': store.ledState }" />
-                <div class="img"><img ref="icon" v-if="store.icon" :src="store.icon" />
+            <v-card-text
+                class="switch-landscape"
+                @click="switchCmd"
+            >
+                <div :class="{ 'switch-landscape_led': true, 'led-on': store.ledState }" />
+                <div class="img">
+                    <img
+                        v-if="store.icon"
+                        ref="icon"
+                        :src="store.icon"
+                    >
                 </div>
                 <div class="switch-landscape__description">
                     {{ name }}
                 </div>
-            </div>
-
+            </v-card-text>
         </template>
 
         <template #portrait>
-            <div @click="switchCmd.execute()" class="switch-portrait">
+            <div
+                class="switch-portrait"
+                @click="switchCmd"
+            >
                 <div class="switch-portrait_icon">
-                    <img ref="icon" v-if="store.icon" :src="store.icon" />
-                    <div v-bind:class="{ 'switch-portrait_icon_led': true, 'led-on': store.ledState }" />
+                    <img
+                        v-if="store.icon"
+                        ref="icon"
+                        :src="store.icon"
+                    >
+                    <div :class="{ 'switch-portrait_icon_led': true, 'led-on': store.ledState }" />
                 </div>
                 <div class="switch-portrait_description">
                     <h2>{{ name }}</h2>

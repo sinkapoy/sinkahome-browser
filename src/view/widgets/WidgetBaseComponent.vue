@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-widgets';
+import { computed } from 'vue';
+import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
 
-const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean; }>();
+const props = defineProps<{ widget: IWidgetViewModel; portrait: boolean; }>();
 
 const width = computed(() => {
     return props.widget.properties['width']?.value as number || 2;
@@ -22,16 +22,18 @@ const y = computed(() => {
 </script>
 
 <template>
-    
     <template v-if="!props.portrait">
-        <div class="widget widget-landscape container" :style="{
-            width: width * 4 + (width - 1) * 0.5 + 'rem',
-            height: height * 4 + (height - 1) * 0.5 + 'rem',
-            'grid-area': `${(y + 1)}/${(x + 1)}/${y + 1 + height}/${x + 1 + width}`,
-        }
-            ">
+        <div
+            class="widget widget-landscape container"
+            :style="{
+                width: width * 4 + (width - 1) * 0.5 + 'rem',
+                height: height * 4 + (height - 1) * 0.5 + 'rem',
+                'grid-area': `${(y + 1)}/${(x + 1)}/${y + 1 + height}/${x + 1 + width}`,
+            }
+            "
+        >
             <audio autoplay>
-            <source src="pop.mp3" />
+                <source src="pop.mp3">
             </audio>
             <slot name="landscape" />
         </div>
@@ -65,12 +67,13 @@ const y = computed(() => {
     width: $widgetBlockSize;
     height: $widgetBlockSize;
     display: block;
-    box-shadow: boxShadow(0.1rem);
+    // box-shadow: boxShadow(0.1rem);
 }
 
 .widget-portrait {
-    width: calc(100% - 2rem);
+    // // width: calc(100% - 2rem);
     height: auto;
-    box-shadow: boxShadow(1rem);
+    // padding: 0px;
+    // box-shadow: boxShadow(1rem);
 }
 </style>

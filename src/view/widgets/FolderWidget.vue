@@ -1,24 +1,21 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive } from 'vue';
-import WidgetBaseComponent from './WidgetBaseComponent.vue';
-import WidgetsView from '../WidgetsView.vue';
-import { WritePropertyCommand } from "@sinkapoy/home-integrations-commands";
-import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
+import {WidgetBaseComponent} from '@sinkapoy/home-integrations-vue-components';
+import { IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
 import FolderLayout from './FolderLayout.vue';
 import { rootViewModel } from '@/viewmodel/rootViewModel';
 const vm = rootViewModel;
-const props = defineProps<{ widget: IWidgetViewModel, portrait: boolean }>();
+const props = defineProps<{ widget: IWidgetViewModel; portrait: boolean; }>();
 const store = reactive({ destroyed: false });
-const name = computed(() => props.widget.properties['name']?.value || 'untitled');
 const childrenProp = props.widget.properties['children'];
 const layout = childrenProp?.value ?? [];
-const children = computed(()=>{
-    return layout.map(uuid=>vm.widgets[uuid]).filter(w=>w !== undefined);
+const children = computed(() => {
+    return layout.map(uuid => vm.gadgets[uuid]).filter(w => w !== undefined);
 });
 
 onMounted(() => {
     store.destroyed = false;
-    name.effect.run();
+    // name.effect.run();
 });
 onBeforeUnmount(() => {
     store.destroyed = true;
@@ -27,18 +24,31 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <WidgetBaseComponent :widget="props.widget" :portrait="props.portrait">
+    <WidgetBaseComponent
+        :widget="props.widget"
+        :portrait="props.portrait"
+    >
         <template #landscape>
-            <div class="folder-landscape">
-                <FolderLayout :widgets="children" :portrait="props.portrait"></FolderLayout>
+            <div class="v-card v-card--density-default v-card--variant-elevate folder-landscape">
+                <FolderLayout
+                    :widgets="children"
+                    :portrait="props.portrait"
+                />
             </div>
-
         </template>
 
         <template #portrait>
-            <div class="folder-portrait">
-                <FolderLayout :widgets="children" :portrait="props.portrait"></FolderLayout>
-            </div>
+            <v-expansion-panels>
+                <v-expansion-panel class="folder-portrait">
+                    <v-expansion-panel-title>{{ widget.properties['name']?.value }}</v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                        <FolderLayout
+                            :widgets="children"
+                            :portrait="props.portrait"
+                        />
+                    </v-expansion-panel-text>
+                </v-expansion-panel>
+            </v-expansion-panels>
         </template>
     </WidgetBaseComponent>
 </template>
@@ -50,12 +60,16 @@ onBeforeUnmount(() => {
     width: inherit;
     height: inherit;
     padding: 0px;
+    background-color: var(--v-theme-surface);
+    overflow: hidden;
 }
 
 .folder-portrait {
     display: flex;
     flex-direction: column;
-
+    .v-expansion-panel-text {
+        padding-bottom: 1rem;
+    }
 }
 
 .led-on {

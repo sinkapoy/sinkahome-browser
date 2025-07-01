@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { rootViewModel } from '@/viewmodel/rootViewModel';
-import { PropertiesComponent, Property } from '@sinkapoy/home-core';
+import {  Property } from '@sinkapoy/home-core';
 import { reactive } from 'vue';
 import GadgetPropertyComponent from './GadgetPropertyComponent.vue';
 import GadgetActionComponent from './GadgetActionComponent.vue';
@@ -22,14 +22,19 @@ const clickSelectGadget = async (uuid: string) => {
 
 const clickBack = () => {
     store.showProps = null;
-}
+};
 
 </script>
 
 <template>
-    <div class="container window">
+    <v-sheet class="gadgets-window">
         <template v-if="!store.showProps">
-            <div class="container gadget" v-for="gadget in vm.gadgets" @click="clickSelectGadget(gadget.uuid)">
+            <div
+                v-for="gadget in vm.gadgets"
+                :key="gadget.uuid"
+                class="container gadget"
+                @click="clickSelectGadget(gadget.uuid)"
+            >
                 <div>
                     <h3>{{ gadget.uuid }}</h3>
 
@@ -39,31 +44,45 @@ const clickBack = () => {
                 </div>
             </div>
         </template>
-        <div v-else class="container gadget-settings">
-            <button @click="clickBack">back</button>
-            <div>
-                <h3>{{ store.showProps }}</h3>
-            </div>
-            <div class="properties">
-                <h4>Properties</h4>
-                <div class="properties__content">
-                    <GadgetPropertyComponent v-for="property of rootViewModel.gadgets[store.showProps].properties" :prop="property"
-                        :uuid="store.showProps" />
-                </div>
-            </div>
-            <div class="actions">
-                <h4>Actions</h4>
-                <div class="actions__content">
-                    <GadgetActionComponent v-for="action of rootViewModel.gadgets[store.showProps].actions" :action="action"
-                        :uuid="store.showProps" />
-                </div>
-            </div>
-        </div>
-    </div>
+        <template v-else>
+            <v-btn @click="clickBack">
+                back
+            </v-btn>
+            <v-card
+                class="gadget-settings"
+                :title="store.showProps"
+            >
+                <v-card-text>
+                    <div class="properties">
+                        <h4>Properties</h4>
+                        <div class="properties__content">
+                            <GadgetPropertyComponent
+                                v-for="property of rootViewModel.gadgets[store.showProps].properties"
+                                :key="property.id"
+                                :prop="property"
+                                :uuid="store.showProps"
+                            />
+                        </div>
+                    </div>
+                    <div class="actions">
+                        <h4>Actions</h4>
+                        <div class="actions__content">
+                            <GadgetActionComponent
+                                v-for="action of rootViewModel.gadgets[store.showProps].actions"
+                                :key="action.id"
+                                :action="action"
+                                :uuid="store.showProps"
+                            />
+                        </div>
+                    </div>
+                </v-card-text>
+            </v-card>
+        </template>
+    </v-sheet>
 </template>
 
 <style scoped lang="scss">
-.window {
+.gadgets-window {
     display: flex;
     flex-direction: column;
     row-gap: 1rem;
@@ -72,7 +91,6 @@ const clickBack = () => {
     align-items: flex-start;
     padding: 1rem;
     background: white;
-    width: 100%;
 }
 
 .gadget {

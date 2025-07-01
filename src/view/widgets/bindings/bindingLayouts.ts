@@ -1,10 +1,9 @@
-import WritableSlider from "./WritableSlider.vue";
-import WriteableBinding from "./WriteableBinding.vue";
-import ReadableBinding from "./ReadableBinding.vue";
-import { IProperty, PropertyAccessMode, PropertyDataType } from "@sinkapoy/home-core";
-import { IWidgetViewModel } from "@sinkapoy/home-integrations-vue-widgets";
-import { IBindingInfo } from "./IBindingInfo";
-import WriteableBoolean from "./WriteableBoolean.vue";
+import WritableSlider from './WritableSlider.vue';
+import WriteableBinding from './WriteableBinding.vue';
+import ReadableBinding from './ReadableBinding.vue';
+import { IProperty, PropertyAccessMode, PropertyDataType } from '@sinkapoy/home-core';
+import { IBindingInfo } from './IBindingInfo';
+import WriteableBoolean from './WriteableBoolean.vue';
 
 export const bindingLayouts = {
     writeable: WriteableBinding,

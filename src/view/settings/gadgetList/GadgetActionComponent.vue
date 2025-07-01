@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ActionT, GadgetActionState } from '@sinkapoy/home-core';
-import Multiselect from '@vueform/multiselect';
-import { IAction, Property, PropertyAccessMode, PropertyDataType, homeEngine } from '@sinkapoy/home-core';
-import { computed, onBeforeUnmount, onMounted, reactive, defineProps, watch, render, getCurrentInstance, ref } from 'vue';
-const { action, uuid } = defineProps<{ action: ActionT, uuid: string; }>();
+import { PropertyDataType, homeEngine } from '@sinkapoy/home-core';
+import { reactive, defineProps } from 'vue';
+const { action, uuid } = defineProps<{ action: ActionT; uuid: string; }>();
 
 const callAction = (action: string, args: any[]) => {
     const entity = homeEngine.getByUUID(uuid);
@@ -25,28 +24,41 @@ const processArgs = (args: any[]) => {
     }
 
     return args;
-}
+};
 
 
 </script>
 
 <template>
     <div class="action">
-        <h5 class="action__header">{{ action.id }}</h5>
+        <h5 class="action__header">
+            {{ action.id }}
+        </h5>
         <div class="action__args">
-            <div v-for="arg, index in action.argsT">
+            <div
+                v-for="arg, index in action.argsT"
+                :key="index"
+            >
                 <label>{{ arg.name }}</label>
                 <input v-model="args[index]">
             </div>
         </div>
-        <div v-if="action.lastResult.length" class="action__lastresult">
-            <div v-for="result, index in action.lastResult">
+        <div
+            v-if="action.lastResult.length"
+            class="action__lastresult"
+        >
+            <div
+                v-for="result, index in action.lastResult"
+                :key="index"
+            >
                 <label><b>{{ action.resultT[index]?.name ?? 'undefined' }}:</b></label>
                 <p>{{ result }}</p>
             </div>
         </div>
         <div>{{ GadgetActionState[action.state] }}</div>
-        <button @click="callAction(action.id, processArgs(args))">call</button>
+        <button @click="callAction(action.id, processArgs(args))">
+            call
+        </button>
     </div>
 </template>
 

@@ -1,9 +1,9 @@
-import { Entity, NodeList } from "@ash.ts/ash";
-import { IClientDefaultSend, IServerDefaultSend, ISocketClientEvents } from "@sinkapoy/home-integrations-networking";
-import { rootViewModel } from "@/viewmodel/rootViewModel";
-import { GadgetNode, HomeEngineT, HomeSystem, IHomeCoreEvents, PropertiesComponent, Property, PropertyGadgetNode, homeEngine } from "@sinkapoy/home-core";
-import { reactive } from "vue";
-export class GadgetsViewModelSystem extends HomeSystem {
+import { Entity, NodeList } from '@ash.ts/ash';
+import { IClientDefaultSend, ISocketClientEvents } from '@sinkapoy/home-integrations-networking';
+import { rootViewModel } from '@/viewmodel/rootViewModel';
+import { GadgetNode, HomeSystem} from '@sinkapoy/home-core';
+import { reactive } from 'vue';
+export class GadgetsViewModelSystem extends HomeSystem<ISocketClientEvents> {
 
     private readonly updateTimer = 327;
     private updateCountdown = this.updateTimer;
@@ -13,20 +13,19 @@ export class GadgetsViewModelSystem extends HomeSystem {
         this.nodeList = this.setupNodeList({
             node: GadgetNode,
             onAdd: this.onGadgetAdd,
-            // onUpdate: this.onGadgetUpdate,
         });
 
         this.setupEvent('writeGadgetProperty', this.onPropertyWrite);
         this.setupEvent('invokeGadgetAction', (entity: Entity, actionId: string, ...args: any[])=>{
-                console.debug(`call action for ${entity.name} ${actionId} with args ${args}`);
+            console.debug(`call action for ${entity.name} ${actionId} with args ${args}`);
         });
 
-        // @ts-expect-error
         this.setupEvent('networking:client-connection-established', () => {
-            // @ts-expect-error
-            this.engine.emit('networking:client-send', <IClientDefaultSend['gadget-list']>{
-                comand: 'gadget-list',
-            });
+            setTimeout(()=>{
+                this.engine.emit('networking:client-send', <IClientDefaultSend['gadget-list']>{
+                    comand: 'gadget-list',
+                });
+            }, 20);
         });
     }
 
@@ -87,19 +86,6 @@ export class GadgetsViewModelSystem extends HomeSystem {
     };
 
     private onPropertyWrite = (gadget: Entity, id: string, value: number | string | boolean) => {
-        console.log('write property', gadget.name, id, value);
-
+        console.debug('write property', gadget.name, id, value);
     };
 }
-
-const engine = homeEngine as HomeEngineT<ISocketClientEvents>;
-engine.emit('networking:client-register-PAM', 'gadget-props', (msg: IServerDefaultSend['gadget-props'], ws) => {
-    console.log(msg.props, msg.props.filter(prop => prop.id === 'widget'));
-    if (msg.props.filter(prop => prop.id === 'widget').length) {
-        const gadget = rootViewModel.gadgets[msg.gadget];
-        if (!gadget) throw new Error('cant find gadget ' + msg.gadget);
-        rootViewModel.widgets[msg.gadget] = gadget;
-        gadget.parentFolder = msg.props.filter(prop => prop.id === 'parent')[0]?.value as string | undefined;
-
-    }
-});

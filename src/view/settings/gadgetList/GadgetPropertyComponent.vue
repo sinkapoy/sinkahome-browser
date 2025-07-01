@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import Multiselect from '@vueform/multiselect';
 import { Property, PropertyAccessMode, PropertyDataType, homeEngine } from '@sinkapoy/home-core';
-import { computed, onBeforeUnmount, onMounted, reactive, defineProps, watch, render, getCurrentInstance, ref } from 'vue';
-const { prop, uuid } = defineProps<{ prop: Property<any>, uuid: string; }>();
+import { computed, onBeforeUnmount, onMounted, defineProps } from 'vue';
+const { prop, uuid } = defineProps<{ prop: Property<any>; uuid: string; }>();
 
 const writeValue = (prop: Property<any>) => {
     const entity = homeEngine.getEntityByName(uuid);
@@ -13,9 +12,6 @@ const writeValue = (prop: Property<any>) => {
         case PropertyDataType.int:
             prop.value = Math.round(Number(prop.value));
             break;
-        // case PropertyDataType.boolean:
-        //     prop.value = prop.value == 'true';
-        //     break;
     }
     homeEngine.emit('writeGadgetProperty', entity, prop.id, prop.value);
 };
@@ -29,16 +25,16 @@ const propEnumOptions = computed(()=>{
             return {
                 label: key,
                 value: prop.enumData![key],
-            }
-        })
+            };
+        });
+    return [];
 });
 
 onMounted(() => {
     timer = setInterval(()=>{
         if(prop.value !== value.value){
-            value.effect.run();
-            for(const entry of (reference as unknown as {dep: Set<any>}).dep.values()){
-                entry.fn()
+            for(const entry of (reference as unknown as {dep: Set<any>;}).dep.values()){
+                entry.fn();
             }
         }
     }, 235) as unknown as number;
@@ -52,21 +48,47 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="property">
-        <div>{{ prop.id }}</div>
-        <div>{{ PropertyAccessMode[prop.accessMode] }}</div>
-        <div>{{ PropertyDataType[prop.dataType] }}</div>
-        <div v-if="prop.enumData && (prop.accessMode & PropertyAccessMode.write)">
-            <Multiselect :mode="'single'" @select="writeValue(prop)" v-model="reference.value"
-                :options="propEnumOptions" :can-clear="false" >
-            </Multiselect>
+        <div class="property__cell">
+            {{ prop.id }}
         </div>
-        <div v-else-if="prop.accessMode & PropertyAccessMode.write">
-            <input v-model="reference.value">
-            <span v-if="prop.units">{{ prop.units }}</span>
-            <button @click="writeValue(prop)">-></button>
+        <div class="property__cell">
+            {{ PropertyAccessMode[prop.accessMode] }}
         </div>
-        <div v-else-if="prop.accessMode & PropertyAccessMode.read">
-            {{ reference.value }}
+        <div class="property__cell">
+            {{ PropertyDataType[prop.dataType] }}
+        </div>
+        <div class="property__cell">
+            <div v-if="prop.enumData && (prop.accessMode & PropertyAccessMode.write)">
+                <Multiselect
+                    v-model="reference.value"
+                    :mode="'single'"
+                    :options="propEnumOptions"
+                    :can-clear="false"
+                    @select="writeValue(prop)"
+                />
+            </div>
+            <div
+                v-else-if="prop.accessMode & PropertyAccessMode.write"
+                class="property__writer"
+            >
+                <v-text-field
+                    v-model="reference.value"
+                    class="property__input"
+                    label=""
+                    :hide-details="true"
+                    :size="'1rem'"
+                    style="transform: translate(0, 0.5rem)"
+                />
+                <span v-if="prop.units">{{ prop.units }}</span>
+                <v-btn
+                    icon="check"
+                    size="small"
+                    @click="writeValue(prop)"
+                />
+            </div>
+            <div v-else-if="prop.accessMode & PropertyAccessMode.read">
+                {{ reference.value }}
+            </div>
         </div>
     </div>
 </template>
@@ -75,8 +97,37 @@ onBeforeUnmount(() => {
 .property {
     display: table-row;
 
-    div {
+    &__cell {
         display: table-cell;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        max-height: 2rem;
+    }
+
+    
+
+    &__writer {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: baseline;
+        column-gap: 0.5rem;
+        justify-content: space-between;
+        .v-field {
+            overflow: hidden;
+            .v-input__details {
+                 display: none !important;
+            }
+        }
+        input {
+            min-height: 1rem;
+        }
+        
+        
+    }
+
+    &__input {
+        min-width: 10rem;
     }
 }
 </style>

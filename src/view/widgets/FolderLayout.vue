@@ -1,47 +1,29 @@
 <script setup lang="ts">
-import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
-import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
-import { onMounted, reactive, ref, watch, defineProps } from 'vue';
+import { widgetsIndex, IWidgetViewModel } from '@sinkapoy/home-integrations-vue-components';
+import { defineProps } from 'vue';
 
-const props = defineProps<{ widgets: IGadgetViewModel[], portrait: boolean; }>();
-const getType = function (widget: IGadgetViewModel) {
+const props = defineProps<{ widgets: IWidgetViewModel[]; portrait: boolean; }>();
+const getType = function (widget: IWidgetViewModel) {
     return widget.properties['type']?.value;
 };
-const data = reactive({
-    currentCount: 0,
-    interval: -1 as unknown as NodeJS.Timeout,
-});
-const show = () => {
-    clearInterval(data.interval);
-    data.interval = setInterval(() => {
-        data.currentCount++;
-        if (data.currentCount >= Object.keys(props.widgets).length) {
-            clearInterval(data.interval);
-            data.interval = -1 as any;
-        }
-    }, 100);
-};
 
-
-
-
-watch(props.widgets, () => {
-    show();
-});
-
-onMounted(() => {
-    data.currentCount = 0;
-    show();
-});
 </script>
 
 <template>
-    <div class="folder-layout" :class="props.portrait ? 'folder-layout-portrait' : ''">
-        <template v-for="widget, index in props.widgets">
-            <component v-if="index <= data.currentCount" :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget"
-            :portrait="props.portrait"></component>
+    <div
+        class="v-card folder-layout"
+        :class="props.portrait ? 'folder-layout-portrait' : ''"
+    >
+        <template
+            v-for="widget in props.widgets"
+            :key="widget.uuid"
+        >
+            <component
+                :is="widgetsIndex.typeAlias[getType(widget)]"
+                :widget="widget"
+                :portrait="props.portrait"
+            />
         </template>
-        
     </div>
 </template>
 
@@ -63,7 +45,9 @@ onMounted(() => {
 
 .folder-layout-portrait {
     display: flex;
-    width: 100%;
+    width: auto;
+    align-items: center;
+    // width: 100%;
     margin-top: 0.6rem;
     flex-direction: column;
     flex-wrap: nowrap;

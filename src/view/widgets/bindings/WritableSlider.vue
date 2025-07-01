@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { onBeforeUnmount, watch, defineProps, defineEmits } from 'vue';
-import Slider from '@vueform/slider';
-import { IBindingProps } from './IBindingProps';
+import { onBeforeUnmount, watch, defineProps, defineEmits, ref } from 'vue';
 import { IBindingLayout } from './IBingingLayout';
 import { IBindingInfo } from './IBindingInfo';
+import { VSlider } from 'vuetify/components';
 
 const props = defineProps<{
-    store: IBindingLayout,
-    name: string,
+    store: IBindingLayout;
+    name: string;
     binding: IBindingInfo;
     isAlbum: boolean;
 }>();
 const emit = defineEmits(['write']);
-const model = { value: props.store.realValue };
-const unwatch = watch(props.store, (s) => {
-    if (model.value !== props.store.realValue) {
-        model.value = props.store.realValue;
-    }
+const model = ref(props.store.realValue || 0);
+const unwatch = watch(props.store, (_s) => {
+    setTimeout(() => {
+        if (model.value !== props.store.realValue) {
+            model.value = props.store.realValue;
+        }
+    }, 0);
 });
 const onChange = () => {
     setTimeout(() => emit('write', model.value), 10);
@@ -26,15 +27,35 @@ onBeforeUnmount(unwatch);
 </script>
 
 <template>
-    <label>{{ name }}</label>
     <label v-if="props.store.widgetHeight >= 2">{{ props.store.realValue + store.units }}</label>
-    <Slider class="slider" v-model="model.value" :style="{ width: props.isAlbum ? props.store.widgetWidth * 2 + 'rem' : ''}"
-        :step="binding.step" :min="binding.min" :max="binding.max" @change="onChange" />
+    <v-slider 
+        v-model="model" 
+        class="slider" 
+        :class="isAlbum ? 'slider-album' : ''" 
+        :color="isAlbum ? 'surface' : 'primary'" 
+        :step="binding.step" 
+        :min="binding.min || 0" 
+        :max="binding.max || 1"
+        thumb-label
+        @end="onChange"
+    />
 </template>
 
 <style scoped lang="scss">
-.slider-target {
+
+.slider {
+    flex: 1;
+    // width: 100%;
+    // margin-top: 1.5rem;
+}
+
+.slider-album {
+    height: 1rem;
     width: 80%;
-    margin-top: 1.5rem;
+    margin-top: 0.5rem;
+
+    .v-slider-thumb__label {
+        background-color: black;
+    }
 }
 </style>
