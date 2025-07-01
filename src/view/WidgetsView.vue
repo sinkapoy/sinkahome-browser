@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import { IGadgetViewModel } from '@/viewmodel/IGadgetViewModel';
 import { rootViewModel } from '@/viewmodel/rootViewModel';
-import SwitchWidget from './widgets/SwitchWidget.vue';
-import { widgetsIndex } from '@sinkapoy/home-integrations-vue-widgets';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, watch } from 'vue';
+import { IWidgetViewModel, widgetsIndex } from '@sinkapoy/home-integrations-vue-components';
+import {VDivider} from 'vuetify/components';
 const vm = rootViewModel;
-const getType = function (widget: IGadgetViewModel) {
-    console.log(widget.properties.get('type')?.value, widgetsIndex.typeAlias[widget.properties.get('type')?.value])
-    return widget.properties.get('type')?.value;
-}
+const getType = function (widget: IWidgetViewModel) {
+    return (widget.properties['type']?.value ?? '') as string;
+};
 const data = reactive({
     currentCount: 0,
     interval: -1 as unknown as NodeJS.Timeout,
@@ -21,16 +19,12 @@ const show = () => {
             clearInterval(data.interval);
             data.interval = -1 as any;
         }
-    }, 100);
-}
+    }, 50);
+};
 
 const list = computed(() => {
-    return Object.values(vm.widgets).filter(widget => !widget.parentFolder);
+    return Object.values(vm.gadgets).filter(widget => widget.properties['widget']?.value && !widget.properties['parent']);
 });
-
-widgetsIndex.typeAlias.switch = SwitchWidget;
-
-
 
 watch(vm.widgets, () => {
     show();
@@ -38,14 +32,27 @@ watch(vm.widgets, () => {
 
 onMounted(() => {
     data.currentCount = 0;
-    show();
 });
 </script>
 
 <template>
-    <div class="widgets-view" :class="vm.portrait ? 'widgets-view-portrait' : '' ">
-        <template v-for="widget, index of list">
-            <component :is="widgetsIndex.typeAlias[getType(widget)]" :widget="widget" :portrait="vm.portrait"></component>
+    <div
+        class="widgets-view"
+        :class="vm.portrait ? 'widgets-view-portrait' : '' "
+    >
+        <template
+            v-for="widget of list"
+            :key="widget.uuid"
+        >
+            <component
+                :is="widgetsIndex.typeAlias[getType(widget)]"
+                :widget="widget"
+                :portrait="vm.portrait"
+            />
+            <v-divider
+                v-if="vm.portrait"
+                :key="widget.uuid"
+            />
         </template>
     </div>
 </template>
@@ -72,11 +79,13 @@ onMounted(() => {
 }
 
 .widgets-view-portrait {
-        flex-direction: column;
-        flex-wrap: nowrap;
-        row-gap: 1rem;
         padding: 0.5rem;
         padding-bottom: 4rem;
-        display: flex;
+        display: block;
+        text-align: center;
+        
+        .v-card {
+            width: auto;
+        }
     }
 </style>

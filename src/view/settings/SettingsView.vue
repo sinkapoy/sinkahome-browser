@@ -1,25 +1,27 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
-import SettingsGadgetsListComponent from './gadgetList/SettingsGadgetsListComponent.vue';
+import { RouterView, useRoute, useRouter } from 'vue-router';
+import {globalRoutes} from '@sinkapoy/home-integrations-vue-components';
 
-const data = reactive({
-    currentTab: 0,
-})
-const tabs = [
-    { name: 'gadgets', component: SettingsGadgetsListComponent }
-]
-const selectTab = (tab: number)=>{
-    data.currentTab = tab >= 0 ? tab : 0;
-}
 
+const route = useRoute();
+const router = useRouter();
 </script>
 
 <template>
-    <div class="settings-view">
+    <div :class="'settings-view'">
         <div class="header">
-            <button v-for="tab, index in tabs" class="container" @click="selectTab(index)">{{ tab.name }}</button>
+            <v-btn
+                v-for="path in globalRoutes.getAvailableRoutes('/settings')"
+                :key="path.path"
+                @click="router.push(path)"
+            >
+                {{ path.name }}
+            </v-btn>
         </div>
-        <component :is="tabs[data.currentTab].component" class="content" />
+        <router-view
+            class="content"
+            :route="route"
+        />
     </div>
 </template>
 
@@ -29,7 +31,8 @@ const selectTab = (tab: number)=>{
     width: auto;
     flex-direction: column;
     row-gap: 1rem;
-    
+    flex: 1;
+    flex-wrap: nowrap;
 }
 
 .header {
@@ -41,6 +44,7 @@ const selectTab = (tab: number)=>{
 
 .content {
     width: 100%;
-    flex-wrap: wrap;
+    align-items: stretch;
+    overflow-y: auto;   
 }
 </style>

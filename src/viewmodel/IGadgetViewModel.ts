@@ -1,8 +1,10 @@
-import { uuidT, PropertiesComponent, ActionsComponent, EventsComponent } from "@sinkapoy/home-core";
+import { uuidT, IGadgetEvent, Property, ActionT } from '@sinkapoy/home-core';
+
+/** @deprecated */
 export interface IGadgetViewModel {
     uuid: uuidT;
-    properties: PropertiesComponent;
-    actions: ActionsComponent;
-    events: EventsComponent;
+    properties: Record<string, Property<any>>;
+    actions: Record<string, ActionT>;
+    events: Record<string, IGadgetEvent>;
     parentFolder?: uuidT;
 }

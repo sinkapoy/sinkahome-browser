@@ -1,15 +1,3 @@
-import { reactive } from "vue";
-import { IGadgetViewModel } from "./IGadgetViewModel";
-import { uuidT } from "@sinkapoy/home-core";
+import { rootViewModel as rvm } from '@sinkapoy/home-integrations-vue-components';
 
-export class RootViewModel {
-    portrait = false;
-    gadgets: Record<uuidT, IGadgetViewModel> = {};
-    widgets: Record<uuidT, IGadgetViewModel> = {};
-}
-
-export const rootViewModel = reactive(new RootViewModel());
-
-if (process.env['environment'] === 'development') {
-    (window as any).rootViewModel = rootViewModel;
-}
+export const rootViewModel = rvm;
